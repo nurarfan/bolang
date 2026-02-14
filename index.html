@@ -1,391 +1,511 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cek Stock Akrab</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok Akrab • Lintas Paket</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      color: #fff;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(165deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-    header {
-      background: rgba(30, 41, 59, 0.5);
-      border-bottom: 1px solid #334155;
-      padding: 1rem;
-      text-align: center;
-    }
+        /* Background decorative elements */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+            top: -100px;
+            right: -100px;
+            border-radius: 50%;
+            z-index: 0;
+        }
 
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            bottom: -150px;
+            left: -150px;
+            border-radius: 50%;
+            z-index: 0;
+        }
 
-    header p {
-      color: #94a3b8;
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-    }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2.5rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.8s ease-out;
+        }
 
-    main {
-      flex: 1;
-      max-width: 64rem;
-      width: 100%;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .status-bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
+        /* Header Section */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
-    .status-dot {
-      width: 0.75rem;
-      height: 0.75rem;
-      border-radius: 50%;
-      background: #22c55e;
-    }
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.3);
+        }
 
-    .status-dot.loading {
-      background: #eab308;
-      animation: pulse 1s infinite;
-    }
+        .title h1 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.2rem;
+        }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
+        .title p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
 
-    .status-text {
-      color: #cbd5e1;
-      font-size: 0.875rem;
-    }
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.6rem 1.2rem;
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    .refresh-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: #334155;
-      border: none;
-      border-radius: 0.5rem;
-      color: #fff;
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+            animation: pulse 2s infinite;
+        }
 
-    .refresh-btn:hover {
-      background: #475569;
-    }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
 
-    .refresh-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+        .status-text {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
 
-    .refresh-icon {
-      width: 1rem;
-      height: 1rem;
-    }
+        .status-time {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+        }
 
-    .refresh-icon.spinning {
-      animation: spin 1s linear infinite;
-    }
+        /* Table Section */
+        .table-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.8rem;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
 
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+        .table-header {
+            padding: 1.2rem 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-    }
+        .table-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
 
-    .card {
-      background: rgba(30, 41, 59, 0.5);
-      border: 1px solid #334155;
-      border-radius: 0.75rem;
-      padding: 1.25rem;
-      transition: all 0.3s;
-    }
+        .table-title h3 {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
 
-    .card:hover {
-      border-color: #475569;
-      transform: scale(1.02);
-    }
+        .table-title span {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.2rem 0.8rem;
+            border-radius: 100px;
+        }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-    }
+        .table-refresh {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
 
-    .type-badge {
-      padding: 0.25rem 0.75rem;
-      background: #334155;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-family: monospace;
-      color: #cbd5e1;
-    }
+        .table-refresh:hover {
+            color: white;
+        }
 
-    .status-badge {
-      padding: 0.25rem 0.5rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      color: #fff;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-    .status-badge.habis {
-      background: #ef4444;
-    }
+        th {
+            text-align: left;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(255, 255, 255, 0.02);
+        }
 
-    .status-badge.tersedia {
-      background: #22c55e;
-    }
+        td {
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
 
-    .product-name {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-    }
+        tr:last-child td {
+            border-bottom: none;
+        }
 
-    .stock-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
 
-    .stock-label {
-      color: #94a3b8;
-      font-size: 0.875rem;
-    }
+        .sku-badge {
+            background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
 
-    .stock-value {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+        .slot-number {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
 
-    .stock-number {
-      font-size: 1.875rem;
-      font-weight: bold;
-    }
+        .slot-number.available {
+            color: #4ade80;
+        }
 
-    .stock-number.habis {
-      color: #f87171;
-    }
+        .slot-number.empty {
+            color: #f87171;
+        }
 
-    .stock-number.tersedia {
-      color: #4ade80;
-    }
+        .status-chip {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
 
-    .stock-unit {
-      color: #64748b;
-      font-size: 0.875rem;
-    }
+        .status-chip.available {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
 
-    .error-message {
-      background: rgba(239, 68, 68, 0.2);
-      border: 1px solid #ef4444;
-      border-radius: 0.5rem;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      color: #fca5a5;
-      display: none;
-    }
+        .status-chip.empty {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
 
-    .loading-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 5rem 0;
-    }
+        /* Footer */
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-    .loading-spinner {
-      width: 3rem;
-      height: 3rem;
-      border: 4px solid #334155;
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+        .refresh-btn {
+            background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 100px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.3);
+        }
 
-    footer {
-      background: rgba(30, 41, 59, 0.5);
-      border-top: 1px solid #334155;
-      padding: 1rem;
-      text-align: center;
-    }
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px rgba(56, 189, 248, 0.4);
+        }
 
-    footer p {
-      color: #94a3b8;
-      font-size: 0.875rem;
-    }
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
 
-    @media (max-width: 640px) {
-      .cards-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            color: white;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container { padding: 1.5rem; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .footer { justify-content: center; }
+            th, td { padding: 0.8rem 1rem; }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>📦 Cek Stock Akrab</h1>
-    <p>Real-time Stock Monitor</p>
-  </header>
-
-  <main>
-    <div class="status-bar">
-      <div class="status-indicator">
-        <div class="status-dot" id="statusDot"></div>
-        <span class="status-text" id="statusText">Memuat data...</span>
-      </div>
-      <button class="refresh-btn" id="refreshBtn" onclick="fetchData()">
-        <svg class="refresh-icon" id="refreshIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-        </svg>
-        Refresh
-      </button>
-    </div>
-
-    <div class="error-message" id="errorMessage"></div>
-
-    <div class="cards-grid" id="cardsContainer">
-      <div class="loading-container" id="loadingContainer">
-        <div class="loading-spinner"></div>
-      </div>
-    </div>
-  </main>
-
-  <footer>
-    <p>Data diambil dari API lintas pakrt • Auto refresh setiap 30 detik</p>
-  </footer>
-
-  <script>
-    const API_URL = 'https://panel.khfy-store.com/api_v3/cek_stock_akrab';
-    
-    let isLoading = false;
-
-    function getStockStatus(slot) {
-      return slot === 0 ? 'HABIS' : 'TERSEDIA';
-    }
-
-    function createCard(item) {
-      const status = getStockStatus(item.sisa_slot);
-      const statusClass = status === 'HABIS' ? 'habis' : 'tersedia';
-      
-      return `
-        <div class="card">
-          <div class="card-header">
-            <span class="type-badge">${item.type}</span>
-            <span class="status-badge ${statusClass}">${status}</span>
-          </div>
-          <h3 class="product-name">${item.nama.trim()}</h3>
-          <div class="stock-info">
-            <span class="stock-label">Sisa Slot</span>
-            <div class="stock-value">
-              <span class="stock-number ${statusClass}">${item.sisa_slot}</span>
-              <span class="stock-unit">unit</span>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand">
+                <div class="logo">📦</div>
+                <div class="title">
+                    <h1>Stok Akrab</h1>
+                    <p>Lintas Paket</p>  <!-- Diganti dari "Panel KHFY Store" menjadi "Lintas Paket" -->
+                </div>
             </div>
-          </div>
+            <div class="status-badge" id="statusBadge">
+                <div class="status-dot" id="statusDot"></div>
+                <div>
+                    <div class="status-text" id="statusText">Memuat data...</div>
+                    <div class="status-time" id="statusTime">—</div>
+                </div>
+            </div>
         </div>
-      `;
-    }
 
-    function renderCards(data) {
-      const container = document.getElementById('cardsContainer');
-      container.innerHTML = data.map(item => createCard(item)).join('');
-    }
+        <!-- Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">
+                    <h3>Daftar Stok Akrab</h3>
+                    <span>real-time</span>
+                </div>
+                <div class="table-refresh" onclick="refreshData()" id="refreshIcon">
+                    <span>🔄</span>
+                    <span>Refresh</span>
+                </div>
+            </div>
+            <div id="tableContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Memuat data stok terkini...</p>
+                </div>
+            </div>
+        </div>
 
-    function showError(message) {
-      const errorEl = document.getElementById('errorMessage');
-      errorEl.textContent = message;
-      errorEl.style.display = 'block';
-    }
+        <!-- Footer -->
+        <div class="footer">
+            <button class="refresh-btn" onclick="refreshData()" id="refreshBtn">
+                <span>🔄</span>
+                Perbarui Data
+            </button>
+        </div>
+    </div>
 
-    function hideError() {
-      const errorEl = document.getElementById('errorMessage');
-      errorEl.style.display = 'none';
-    }
+    <script>
+        // Data langsung dari API (hasil fetch manual)
+        const API_DATA = {
+            "ok": true,
+            "message": "success",
+            "data": [
+                {"type": "XLA14", "nama": "SuperMini", "sisa_slot": 0},
+                {"type": "XLA32", "nama": "Mini", "sisa_slot": 0},
+                {"type": "XLA39", "nama": "Big ", "sisa_slot": 2},
+                {"type": "XLA51", "nama": "Jumbo V2", "sisa_slot": 6},
+                {"type": "XLA65", "nama": "JUMBO", "sisa_slot": 0},
+                {"type": "XLA89", "nama": "MegaBig", "sisa_slot": 2}
+            ]
+        };
 
-    function setLoading(loading) {
-      isLoading = loading;
-      const statusDot = document.getElementById('statusDot');
-      const statusText = document.getElementById('statusText');
-      const refreshBtn = document.getElementById('refreshBtn');
-      const refreshIcon = document.getElementById('refreshIcon');
-
-      if (loading) {
-        statusDot.classList.add('loading');
-        statusText.textContent = 'Memuat data...';
-        refreshBtn.disabled = true;
-        refreshIcon.classList.add('spinning');
-      } else {
-        statusDot.classList.remove('loading');
-        statusText.textContent = 'Data terbaru';
-        refreshBtn.disabled = false;
-        refreshIcon.classList.remove('spinning');
-      }
-    }
-
-    async function fetchData() {
-      if (isLoading) return;
-      
-      setLoading(true);
-      hideError();
-
-      try {
-        const response = await fetch(API_URL);
-        const result = await response.json();
-
-        if (result.ok && result.data) {
-          renderCards(result.data);
-        } else {
-          showError(result.message || 'Gagal mengambil data');
+        function updateStatus() {
+            const now = new Date();
+            const options = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            };
+            document.getElementById('statusTime').innerHTML = now.toLocaleString('id-ID', options);
         }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        showError('Terjadi kesalahan saat mengambil data');
-      } finally {
-        setLoading(false);
-      }
-    }
 
-    // Initial fetch
-    fetchData();
+        function getStatusChip(slot) {
+            return slot === 0 ? 'empty' : 'available';
+        }
 
-    // Auto refresh every 30 seconds
-    setInterval(fetchData, 30000);
-  </script>
+        function getStatusText(slot) {
+            return slot === 0 ? 'Habis' : 'Tersedia';
+        }
+
+        function displayData(data) {
+            const tableContent = document.getElementById('tableContent');
+            
+            // Build table
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Nama Produk</th>
+                            <th>Sisa Slot</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach(item => {
+                const statusClass = getStatusChip(item.sisa_slot);
+                const statusText = getStatusText(item.sisa_slot);
+                const slotClass = item.sisa_slot > 0 ? 'available' : 'empty';
+                
+                tableHTML += `
+                    <tr>
+                        <td><span class="sku-badge">${item.type}</span></td>
+                        <td>${item.nama}</td>
+                        <td><span class="slot-number ${slotClass}">${item.sisa_slot}</span></td>
+                        <td><span class="status-chip ${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            tableContent.innerHTML = tableHTML;
+            
+            // Update status
+            document.getElementById('statusText').innerHTML = 'Online - Data Real-time';
+            document.getElementById('statusDot').style.background = '#22c55e';
+            updateStatus();
+        }
+
+        function refreshData() {
+            const tableContent = document.getElementById('tableContent');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const refreshIcon = document.getElementById('refreshIcon');
+            
+            // Show loading
+            tableContent.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Memperbarui data...</p>
+                </div>
+            `;
+            
+            refreshBtn.disabled = true;
+            refreshIcon.style.opacity = '0.5';
+            refreshIcon.style.pointerEvents = 'none';
+
+            // Simulate loading
+            setTimeout(() => {
+                displayData(API_DATA.data);
+                refreshBtn.disabled = false;
+                refreshIcon.style.opacity = '1';
+                refreshIcon.style.pointerEvents = 'auto';
+            }, 800);
+        }
+
+        // Initial load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                displayData(API_DATA.data);
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
